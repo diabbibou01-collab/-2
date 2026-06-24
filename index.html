@@ -326,6 +326,25 @@
         @keyframes fadeIn  { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
         @keyframes scaleUp { from { opacity:0; transform:scale(0.92); }      to { opacity:1; transform:scale(1); } }
         @keyframes pulse   { from { opacity:1; } to { opacity:0.4; } }
+
+        /* لوحة المتصدرين */
+        #leaderboard-box { display: none; animation: fadeIn 0.5s ease; }
+        #leaderboard-box h2 { background: linear-gradient(135deg, var(--gold), var(--gold-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.8rem; text-align: center; margin-bottom: 6px; }
+        .lb-subtitle { color: var(--muted); text-align: center; font-size: 0.9rem; margin-bottom: 25px; }
+        .nav-tabs { display: flex; gap: 0; margin-bottom: 25px; border-bottom: 1px solid var(--gold-border); }
+        .nav-tab { padding: 10px 22px; cursor: pointer; color: var(--muted); font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s; font-size: 0.95rem; }
+        .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+        .lb-table { width: 100%; border-collapse: collapse; }
+        .lb-table thead tr { background: linear-gradient(135deg, #1a1200, #2a1f00); }
+        .lb-table th { padding: 12px 14px; color: var(--gold); font-size: 0.88rem; font-weight: 700; text-align: right; }
+        .lb-table tbody tr { border-bottom: 1px solid rgba(201,168,76,0.08); transition: background 0.2s; }
+        .lb-table tbody tr:hover { background: var(--gold-soft); }
+        .lb-table td { padding: 12px 14px; color: var(--white); font-size: 0.93rem; text-align: right; }
+        .lb-rank { font-weight: 800; font-size: 1.1rem; }
+        .rank-1 { color: #ffd700; } .rank-2 { color: #c0c0c0; } .rank-3 { color: #cd7f32; }
+        .lb-score { display: inline-block; padding: 3px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; background: var(--gold-soft); color: var(--gold-light); border: 1px solid var(--gold-border); }
+        .lb-empty { text-align: center; color: var(--muted); padding: 30px; }
+        .lb-me { background: rgba(201,168,76,0.08) !important; }
     </style>
 </head>
 <body>
@@ -338,6 +357,7 @@
     <div class="header-ornament">✦ ❖ ✦</div>
     <h1>فقه المسلم</h1>
     <p>الاختبار الفقهي والديني الشامل</p>
+    <button onclick="showLeaderboard()" style="margin-top:14px; background:linear-gradient(135deg,#c9a84c,#f0d080); color:#000; border:none; padding:9px 24px; border-radius:20px; font-weight:700; font-size:0.95rem; cursor:pointer;">🏆 لوحة المتصدرين</button>
 </header>
 
 <!-- شاشة الدخول -->
@@ -361,6 +381,18 @@
         <div class="error-msg" id="confirm-error">❌ كلمة السر غير متطابقة</div>
     </div>
     <button type="button" class="btn-main btn-gold" id="login-btn" onclick="handleLogin()">تسجيل وبدء التحدي ←</button>
+</div>
+
+<!-- لوحة المتصدرين -->
+<div class="container" id="leaderboard-box">
+    <h2>🏆 لوحة المتصدرين</h2>
+    <p class="lb-subtitle">أفضل المتسابقين في منصة فقه المسلم</p>
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="switchTab('top')">🥇 الأعلى نقاطاً</div>
+        <div class="nav-tab" onclick="switchTab('recent')">🕐 الأحدث</div>
+    </div>
+    <div id="lb-content"></div>
+    <button type="button" class="btn-main" style="margin-top:20px;" onclick="hideLeaderboard()">← رجوع</button>
 </div>
 
 <!-- الاختبار -->
@@ -388,7 +420,8 @@
         <div class="score" id="score-text">0 / 0</div>
         <div class="time-used" id="time-used-text"></div>
         <div id="feedback-text"></div>
-        <button type="button" class="btn-main" onclick="toggleReview()">📋 مراجعة الإجابات التفصيلية</button>
+        <button type="button" class="btn-main" onclick="showLeaderboard()">🏆 لوحة المتصدرين</button>
+        <button type="button" class="btn-main" style="margin-top:12px;" onclick="toggleReview()">📋 مراجعة الإجابات</button>
         <button type="button" class="btn-main btn-gold" style="margin-top:12px;" onclick="window.location.reload()">🔄 إعادة الاختبار</button>
     </div>
 
@@ -414,258 +447,4 @@
     }
     function saveUsers(u) { localStorage.setItem('fiqh_users', JSON.stringify(u)); }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('username').addEventListener('input', updateLoginMode);
-    });
-
-    function updateLoginMode() {
-        const name = document.getElementById('username').value.trim();
-        const users = getUsers();
-        const confirmGroup = document.getElementById('confirm-group');
-        const subtitle = document.getElementById('login-subtitle');
-        const btn = document.getElementById('login-btn');
-        const passInput = document.getElementById('password');
-        if (name && users[name]) {
-            confirmGroup.style.display = 'none';
-            subtitle.innerText = `مرحباً بعودتك ${name}! أدخل كلمة سرك للمتابعة.`;
-            btn.innerText = 'دخول والبدء في التحدي ←';
-            passInput.placeholder = 'أدخل كلمة سرك...';
-        } else {
-            confirmGroup.style.display = 'block';
-            subtitle.innerText = 'مستخدم جديد؟ اختر كلمة سر خاصة بك وابدأ!';
-            btn.innerText = 'تسجيل وبدء التحدي ←';
-            passInput.placeholder = 'اختر كلمة سر خاصة بك...';
-        }
-    }
-
-    function handleLogin() {
-        const name = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value.trim();
-        const passConfirm = document.getElementById('password-confirm').value.trim();
-        const passErr = document.getElementById('pass-error');
-        const confirmErr = document.getElementById('confirm-error');
-        passErr.style.display = 'none';
-        confirmErr.style.display = 'none';
-
-        if (!name) { alert("فضلاً، أدخل اسمك أولاً."); return; }
-        if (!pass)  { alert("فضلاً، أدخل كلمة السر."); return; }
-
-        const users = getUsers();
-        if (users[name]) {
-            if (users[name] !== pass) {
-                passErr.innerText = '❌ كلمة السر غير صحيحة، حاول مرة أخرى.';
-                passErr.style.display = 'block';
-                document.getElementById('password').value = '';
-                document.getElementById('password').focus();
-                return;
-            }
-        } else {
-            if (pass.length < 4) {
-                passErr.innerText = '❌ كلمة السر يجب أن تكون 4 أحرف على الأقل.';
-                passErr.style.display = 'block';
-                return;
-            }
-            if (pass !== passConfirm) {
-                confirmErr.style.display = 'block';
-                return;
-            }
-            users[name] = pass;
-            saveUsers(users);
-        }
-
-        currentUserName = name;
-        document.getElementById('login-box').style.display = 'none';
-        document.getElementById('quiz-section').style.display = 'block';
-        document.getElementById('p-container').style.display = 'block';
-        document.getElementById('user-welcome').innerText = currentUserName;
-        loadQuiz();
-        startTimer();
-    }
-
-    function startTimer() {
-        secondsElapsed = 0;
-        updateTimerDisplay(QUIZ_TIME_SECONDS);
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            const remaining = QUIZ_TIME_SECONDS - secondsElapsed;
-            updateTimerDisplay(remaining);
-            if (remaining <= 60) {
-                document.getElementById('timer-display').classList.add('warning');
-                document.getElementById('timer-bar').style.background = 'linear-gradient(90deg, #ef5350, #ff8a80)';
-                document.getElementById('timer-bar').style.boxShadow = '0 0 8px #ef5350';
-            }
-            if (remaining <= 0) {
-                clearInterval(timerInterval);
-                alert("⏰ انتهى الوقت! سيتم عرض نتيجتك الآن.");
-                calculateScore();
-            }
-        }, 1000);
-    }
-
-    function updateTimerDisplay(remaining) {
-        const m = Math.floor(remaining / 60).toString().padStart(2,'0');
-        const s = (remaining % 60).toString().padStart(2,'0');
-        document.getElementById('timer-display').innerText = `⏱ ${m}:${s}`;
-        document.getElementById('timer-bar').style.width = ((remaining / QUIZ_TIME_SECONDS) * 100) + '%';
-    }
-
-    const quizData = [
-        { question: "ما هو الركن الثاني من أركان الإسلام؟", options: ["إيتاء الزكاة","إقام الصلاة","صوم رمضان","حج البيت"], correct: 1 },
-        { question: "ما هي أطول سورة في القرآن الكريم؟", options: ["سورة آل عمران","سورة النساء","سورة البقرة","سورة المائدة"], correct: 2 },
-        { question: "كم عدد الصلوات المفروضة في اليوم والليلة؟", options: ["3 صلوات","5 صلوات","7 صلوات","12 صلاة"], correct: 1 },
-        { question: "من هو النبي الذي لُقب بـ 'أبو الأنبياء'؟", options: ["نوح عليه السلام","موسى عليه السلام","إبراهيم عليه السلام","عيسى عليه السلام"], correct: 2 },
-        { question: "ما هي السورة التي تعدل ثلث القرآن الكريم؟", options: ["سورة الإخلاص","سورة الفاتحة","سورة الكافرون","سورة يس"], correct: 0 },
-        { question: "كم عدد أركان الإيمان؟", options: ["خمسة أركان","ستة أركان","سبعة أركان","أربعة أركان"], correct: 1 },
-        { question: "ما هو الميقات المكاني لأهل المدينة المنورة في الحج والعمرة؟", options: ["قرن المنازل","يلملم","ذو الحليفة (آبار علي)","الجحفة"], correct: 2 },
-        { question: "ما حكم صلاة الوتر في الفقه الإسلامي؟", options: ["فرض عين","سنة مؤكدة","مباحة","فرض كفاية"], correct: 1 },
-        { question: "في أي شهر هجري فُرِض صيام رمضان؟", options: ["شعبان","رجب","رمضان نفسه","شوال"], correct: 0 },
-        { question: "ما هي أقصر سورة في القرآن الكريم؟", options: ["سورة النصر","سورة العصر","سورة الإخلاص","سورة الكوثر"], correct: 3 },
-        { question: "كم عدد سجدات التلاوة في القرآن الكريم؟", options: ["10 سجدات","12 سجدة","15 سجدة","7 سجدات"], correct: 2 },
-        { question: "من هو الصحابي الذي لُقِّب بـ 'أمين هذه الأمة'؟", options: ["أبو عبيدة بن الجراح","عمر بن الخطاب","أبو بكر الصديق","علي بن أبي طالب"], correct: 0 },
-        { question: "ما هو السن المعتبر شرعاً للأضحية من الغنم (الضأن)؟", options: ["أن تتم ستة أشهر","أن تتم سنة كاملة","أن تتم سنتين","لا حد لسنها"], correct: 0 },
-        { question: "أي من الخيارات التالية يُبطل الصيام؟", options: ["الحجامة","القيء عمداً","استخدام السواك","قطرة العين"], correct: 1 },
-        { question: "كم عدد أركان الصلاة؟", options: ["14 ركناً","10 أركان","5 أركان","17 ركناً"], correct: 0 },
-        { question: "ما هي الصلاة التي لا ركوع فيها ولا سجود؟", options: ["صلاة الكسوف","صلاة الاستسقاء","صلاة الجنازة","صلاة العيد"], correct: 2 },
-        { question: "من هو أول الخلفاء الراشدين؟", options: ["عمر بن الخطاب","عثمان بن عفان","علي بن أبي طالب","أبو بكر الصديق"], correct: 3 },
-        { question: "كم عدد مصارف الزكاة التي وردت في سورة التوبة؟", options: ["5 مصارف","6 مصارف","8 مصارف","10 مصارف"], correct: 2 },
-        { question: "ما هو الركن الأعظم في الحج؟", options: ["الطواف","السعي","الوقوف بعرفة","الإحرام"], correct: 2 },
-        { question: "في أي سنة هجرية فرض الصيام؟", options: ["السنة الأولى للهجرة","السنة الثانية للهجرة","السنة الثالثة للهجرة","السنة الخامسة للهجرة"], correct: 1 },
-        { question: "ماذا يسمى المطر في قوله تعالى 'وأنزلنا من المعصرات ماءً...'؟", options: ["فراتاً","ثجاجاً","مدراراً","مباركاً"], correct: 1 },
-        { question: "من هي أولى زوجات الرسول ﷺ؟", options: ["عائشة بنت أبي بكر","خديجة بنت خويلد","حفصة بنت عمر","أم سلمة"], correct: 1 },
-        { question: "ما هو الحكم الشرعي لصلوات السنن الرواتب؟", options: ["واجبة","مستحبة (سنة)","فرض كفاية","مباحة"], correct: 1 },
-        { question: "كم عدد الغزوات التي قادها الرسول ﷺ بنفسه؟", options: ["17 غزوة","27 غزوة","9 غزوات","35 غزوة"], correct: 1 },
-        { question: "ما هي عاصمة الدولة الإسلامية في عهد الخلفاء الراشدين الأولين؟", options: ["مكة المكرمة","المدينة المنورة","الكوفة","دمشق"], correct: 1 },
-        { question: "ما هي السورة التي تسمى 'عروس القرآن'؟", options: ["سورة الرحمن","سورة يس","سورة الواقعة","سورة الملك"], correct: 0 },
-        { question: "ما هي كفارة اليمين المنعقدة إذا عجز المرء عن الإطعام والكسوة والعتق؟", options: ["صيام ثلاثة أيام","صيام شهر كامل","صيام عشرة أيام","إطعام عشرين مسكيناً"], correct: 0 },
-        { question: "ما حكم قراءة سورة الفاتحة للمأموم في الصلاة الجهرية عند جمهور العلماء؟", options: ["فرض مطلقاً","مستحبة أو تسقط بإنصاته للإمام","محرمة","مكروهة"], correct: 1 },
-        { question: "على من تجب زكاة الفطر؟", options: ["على الأغنياء فقط","على كل مسلم ملك قوت يومه وليلته","على التجار فقط","تجب على البالغين دون الصغار"], correct: 1 },
-        { question: "ما هي السورة التي تسمى 'المنجية' من عذاب القبر؟", options: ["سورة الكهف","سورة السجدة","سورة الملك","سورة الدخان"], correct: 2 },
-        { question: "كم كان عمر النبي ﷺ عندما نزل عليه الوحي أول مرة؟", options: ["25 سنة","30 سنة","40 سنة","45 سنة"], correct: 2 },
-        { question: "ما السن المعتبرة لذكاة البقر (الأضحية)؟", options: ["أن تتم سنة","أن تتم سنتين وتدخل في الثالثة","أن تتم خمس سنوات","أن تتم ستة أشهر"], correct: 1 },
-        { question: "ما هي أطول آية في القرآن الكريم؟", options: ["آية الكرسي","آية الدين في سورة البقرة","الآية الأولى من سورة النساء","آية المداينة في سورة المائدة"], correct: 1 },
-        { question: "ما هو النوم الذي لا ينقض الوضوء؟", options: ["النوم العميق مستغرقاً","النوم اليسير جالساً أو ممكناً مقعدته","النوم على الجانب الأيمن","كل أنواع النوم تنقض"], correct: 1 },
-        { question: "كم عدد التكبيرات في الركعة الأولى من صلاة العيد (غير تكبيرة الإحرام) على المشهور؟", options: ["3 تكبيرات","5 تكبيرات","6 أو 7 تكبيرات","12 تكبيرة"], correct: 2 },
-        { question: "من هو النبي الذي ابتلعه الحوت؟", options: ["يونس عليه السلام","يوسف عليه السلام","أيوب عليه السلام","سليمان عليه السلام"], correct: 0 },
-        { question: "أي من الغسلات يعد فرضاً في الوضوء؟", options: ["الغسلة الأولى","الغسلة الثانية","الغسلة الثالثة","جميع الغسلات الثلاث فرض"], correct: 0 },
-        { question: "ما هي ميقات الإحرام لأهل الشام ومصر والمغرب؟", options: ["ذو الحليفة","الجحفة (رابغ)","يلملم","ذات عرق"], correct: 1 },
-        { question: "ما هي السورة التي بدأت بغير بسملة؟", options: ["سورة النمل","سورة التوبة (براءة)","سورة الأنفال","سورة الهود"], correct: 1 },
-        { question: "ما حكم الأكل أو الشرب ناسياً في نهار رمضان؟", options: ["يبطل الصيام ويجب القضاء","لا يبطل الصيام وصيامه صحيح","يبطل الصيام ويجب الكفارة الكبرى","صحيح لكن عليه فدية"], correct: 1 },
-        { question: "في أي سورة وردت آية الحجاب؟", options: ["سورة الأحزاب","سورة النور","كلاهما ورد فيهما آيات تخص الحجاب والستر","سورة النساء"], correct: 2 },
-        { question: "كم عدد السور المكية في القرآن الكريم تقريباً مقارنة بالمدنية؟", options: ["المكية هي الأقل","المكية هي الأكثر (نحو 86 سورة)","متساويان تماماً","القرآن كله مكي"], correct: 1 }
-    ];
-
-    function loadQuiz() {
-        document.getElementById('total-q-count').innerText = quizData.length;
-        const container = document.getElementById('quiz-questions');
-        container.innerHTML = '';
-        quizData.forEach((qData, qIndex) => {
-            let optionsHtml = '';
-            qData.options.forEach((option, oIndex) => {
-                optionsHtml += `
-                    <label class="option-item" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex}, this)">
-                        <input type="radio" name="question${qIndex}" value="${oIndex}">
-                        ${option}
-                    </label>`;
-            });
-            container.innerHTML += `
-                <div class="question-container">
-                    <div class="question-title">${qIndex + 1}. ${qData.question}</div>
-                    <div class="options-list">${optionsHtml}</div>
-                </div>`;
-        });
-    }
-
-    function selectOption(qIndex, oIndex, element) {
-        if (quizSubmitted) return;
-        for (let i = 0; i < quizData[qIndex].options.length; i++) {
-            const el = document.getElementById(`opt-${qIndex}-${i}`);
-            if (el) el.classList.remove('selected');
-        }
-        element.classList.add('selected');
-        element.querySelector('input').checked = true;
-        userAnswers[qIndex] = oIndex;
-        updateProgress();
-    }
-
-    function updateProgress() {
-        const answered = Object.keys(userAnswers).length;
-        document.getElementById('answered-count').innerText = answered;
-        document.getElementById('p-bar').style.width = ((answered / quizData.length) * 100) + '%';
-    }
-
-    function calculateScore() {
-        if (quizSubmitted) return;
-        quizSubmitted = true;
-        clearInterval(timerInterval);
-
-        let score = 0;
-        quizData.forEach((qData, qIndex) => {
-            const userAns = userAnswers[qIndex];
-            for (let i = 0; i < qData.options.length; i++) {
-                const el = document.getElementById(`opt-${qIndex}-${i}`);
-                if (!el) continue;
-                el.style.pointerEvents = 'none';
-                if (i === qData.correct) el.classList.add('correct-answer');
-                else if (userAns !== undefined && i === userAns && userAns !== qData.correct)
-                    el.classList.add('wrong-answer');
-            }
-            if (userAns === qData.correct) score++;
-        });
-
-        document.getElementById('quiz-form').style.display = 'none';
-        const resultBox = document.getElementById('result-box');
-        resultBox.style.display = 'block';
-
-        const pct = (score / quizData.length) * 100;
-        let icon = '🏆', feedback = '';
-        if      (pct === 100) { icon = '🏆'; feedback = '✨ ممتاز! أجبت على جميع الأسئلة بشكل صحيح. بارك الله فيك وزادك علماً ونوراً.'; }
-        else if (pct >= 80)   { icon = '⭐'; feedback = '🌟 أداء رائع جداً! معرفتك الفقهية قوية ومتميزة، واصل هذا التفوق.'; }
-        else if (pct >= 60)   { icon = '👍'; feedback = '📗 جيد! تمتلك قاعدة معرفية جيدة، واصل التعلم والمراجعة.'; }
-        else if (pct >= 40)   { icon = '📚'; feedback = '📘 مقبول. ننصحك بمراجعة المسائل الفقهية الأساسية والاطلاع أكثر.'; }
-        else                  { icon = '🔄'; feedback = '💪 لا تيأس! مراجعة الإجابات أدناه ستساعدك كثيراً في المرة القادمة.'; }
-
-        document.getElementById('result-icon').innerText = icon;
-        document.getElementById('user-result-name').innerText = `أحسنت يا ${currentUserName} 🌙`;
-        document.getElementById('score-text').innerText = `${score} / ${quizData.length}`;
-        document.getElementById('feedback-text').innerText = feedback;
-
-        const m = Math.floor(secondsElapsed/60).toString().padStart(2,'0');
-        const s = (secondsElapsed%60).toString().padStart(2,'0');
-        document.getElementById('time-used-text').innerText = `⏱ الوقت المستغرق: ${m}:${s}`;
-
-        buildReview();
-        resultBox.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function buildReview() {
-        const list = document.getElementById('review-list');
-        list.innerHTML = '';
-        quizData.forEach((qData, qIndex) => {
-            const userAns = userAnswers[qIndex];
-            const isCorrect = userAns === qData.correct;
-            list.innerHTML += `
-                <div class="review-item ${isCorrect ? 'is-correct' : 'is-wrong'}">
-                    <span class="review-badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">
-                        ${isCorrect ? '✅ صحيح' : '❌ خطأ'}
-                    </span>
-                    <div class="q-text">${qIndex+1}. ${qData.question}</div>
-                    ${!isCorrect ? `<div class="r-wrong">إجابتك: ${userAns !== undefined ? qData.options[userAns] : 'لم تجب'}</div>` : ''}
-                    <div class="r-correct">✔ الإجابة الصحيحة: ${qData.options[qData.correct]}</div>
-                </div>`;
-        });
-    }
-
-    function toggleReview() {
-        const sec = document.getElementById('review-section');
-        reviewVisible = !reviewVisible;
-        sec.style.display = reviewVisible ? 'block' : 'none';
-        if (reviewVisible) sec.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && document.getElementById('login-box').style.display !== 'none')
-            handleLogin();
-    });
-</script>
-</body>
-</html>
+    wind
