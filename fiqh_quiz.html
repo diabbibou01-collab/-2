@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة فقه المسلم - التحدي الشامل</title>
+    <style>
+        :root {
+            --bg:          #0a0a0a;
+            --bg2:         #111111;
+            --card:        #161616;
+            --card2:       #1e1e1e;
+            --gold:        #c9a84c;
+            --gold-light:  #f0d080;
+            --gold-soft:   rgba(201,168,76,0.12);
+            --gold-border: rgba(201,168,76,0.3);
+            --white:       #f5f0e8;
+            --muted:       #888880;
+            --success:     #4caf50;
+            --error:       #ef5350;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse at top, #1a1400 0%, #0a0a0a 60%),
+                radial-gradient(ellipse at bottom right, #1a1200 0%, transparent 60%);
+            background-attachment: fixed;
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* نجوم خلفية */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 10% 15%, rgba(201,168,76,0.4) 0%, transparent 100%),
+                radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.15) 0%, transparent 100%),
+                radial-gradient(1px 1px at 55% 10%, rgba(201,168,76,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 75% 60%, rgba(255,255,255,0.1) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 25%, rgba(201,168,76,0.35) 0%, transparent 100%),
+                radial-gradient(1px 1px at 20% 80%, rgba(255,255,255,0.12) 0%, transparent 100%),
+                radial-gradient(1px 1px at 65% 85%, rgba(201,168,76,0.25) 0%, transparent 100%);
+            pointer-events: none; z-index: 0;
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: rgba(255,255,255,0.05);
+            z-index: 1000; display: none;
+        }
+        .progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            box-shadow: 0 0 15px var(--gold);
+            transition: width 0.4s ease;
+        }
+
+        /* الهيدر */
+        header {
+            width: 100%; text-align: center;
+            padding: 32px 20px 24px;
+            background: linear-gradient(180deg, #000000 0%, #0d0d0d 100%);
+            border-bottom: 1px solid var(--gold-border);
+            position: relative; z-index: 10;
+        }
+        .header-ornament {
+            color: var(--gold); font-size: 1.2rem;
+            letter-spacing: 12px; margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        header h1 {
+            font-size: 2.6rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px; margin-bottom: 8px;
+        }
+        header p { color: var(--muted); font-size: 1rem; letter-spacing: 1px; }
+
+        /* الحاوية */
+        .container {
+            max-width: 760px; width: 93%;
+            margin: 35px auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--gold-border);
+            box-shadow: 0 0 40px rgba(201,168,76,0.08), 0 20px 50px rgba(0,0,0,0.6);
+            position: relative; z-index: 1;
+        }
+
+        /* شاشة الدخول */
+        #login-box { max-width: 480px; text-align: center; animation: fadeIn 0.5s ease; }
+        .login-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #1a1400, #2a2000);
+            border: 2px solid var(--gold-border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.2rem;
+            box-shadow: 0 0 25px rgba(201,168,76,0.2);
+        }
+        #login-box h2 {
+            color: var(--gold-light); font-size: 1.9rem; margin-bottom: 6px;
+        }
+        #login-box .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 30px; }
+
+        .input-group { margin-bottom: 20px; text-align: right; }
+        .input-group label {
+            display: block; margin-bottom: 8px;
+            color: var(--gold); font-weight: 600; font-size: 0.95rem;
+        }
+        .input-group input {
+            width: 100%; padding: 13px 16px;
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 10px; font-size: 1rem;
+            background: var(--card2); color: var(--white);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-group input::placeholder { color: #555; }
+        .input-group input:focus {
+            border-color: var(--gold); outline: none;
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+        }
+        .error-msg {
+            color: var(--error); font-size: 0.88rem;
+            margin-top: 6px; display: none; font-weight: 600;
+        }
+
+        /* عداد الوقت */
+        #timer-wrap {
+            background: linear-gradient(135deg, #0d0d0d, #161400);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px; padding: 14px 20px;
+            margin-bottom: 25px; text-align: center;
+        }
+        #timer-display {
+            font-size: 2rem; font-weight: 800;
+            color: var(--gold-light); letter-spacing: 3px;
+        }
+        #timer-display.warning { color: var(--error); animation: pulse 0.6s infinite alternate; }
+        #timer-bar-wrap {
+            background: rgba(255,255,255,0.06);
+            border-radius: 6px; height: 6px; margin-top: 10px; overflow: hidden;
+        }
+        #timer-bar {
+            height: 100%; width: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 6px;
+            box-shadow: 0 0 8px var(--gold);
+            transition: width 1s linear, background 0.5s;
+        }
+
+        /* معلومات الاختبار */
+        .quiz-info {
+            background: var(--gold-soft);
+            padding: 14px 18px; border-radius: 10px;
+            margin-bottom: 28px;
+            border: 1px solid var(--gold-border);
+            font-weight: 600; color: var(--white);
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 8px;
+            font-size: 0.95rem;
+        }
+        .quiz-info span { color: var(--gold); }
+
+        /* الأسئلة */
+        .question-container {
+            margin-bottom: 32px; padding-bottom: 28px;
+            border-bottom: 1px solid rgba(201,168,76,0.1);
+        }
+        .question-title {
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--white); margin-bottom: 18px; line-height: 1.7;
+            padding: 14px 18px;
+            background: var(--gold-soft);
+            border-radius: 8px;
+            border-right: 3px solid var(--gold);
+        }
+        .options-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 600px) { .options-list { grid-template-columns: 1fr 1fr; } }
+
+        .option-item {
+            background: var(--card2); padding: 13px 16px;
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer; display: flex; align-items: center;
+            font-size: 0.97rem; color: #ccc;
+            transition: all 0.2s ease; user-select: none;
+        }
+        .option-item:hover {
+            border-color: var(--gold);
+            background: var(--gold-soft);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201,168,76,0.15);
+        }
+        .option-item.selected {
+            border-color: var(--gold);
+            background: var(--gold-soft);
+            color: var(--gold-light); font-weight: 700;
+            box-shadow: 0 0 12px rgba(201,168,76,0.2);
+        }
+        .option-item.correct-answer {
+            background: rgba(76,175,80,0.15) !important;
+            border-color: #4caf50 !important;
+            color: #81c784; font-weight: 700;
+        }
+        .option-item.wrong-answer {
+            background: rgba(239,83,80,0.12) !important;
+            border-color: #ef5350 !important;
+            color: #ef9a9a;
+        }
+        .option-item input {
+            margin-left: 12px; cursor: pointer;
+            transform: scale(1.3); accent-color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        /* الأزرار */
+        .btn-main {
+            display: block; width: 100%;
+            background: linear-gradient(135deg, #1a1200, #2a1f00);
+            color: var(--gold-light); border: 1px solid var(--gold-border);
+            padding: 16px; font-size: 1.15rem;
+            font-weight: 700; border-radius: 12px;
+            cursor: pointer; margin-top: 22px;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+        }
+        .btn-main:hover {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #000; border-color: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201,168,76,0.35);
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #0a0a0a; border-color: var(--gold-light);
+            font-weight: 800;
+            box-shadow: 0 5px 20px rgba(201,168,76,0.3);
+        }
+        .btn-gold:hover {
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            box-shadow: 0 8px 30px rgba(201,168,76,0.5);
+            color: #000;
+        }
+
+        /* النتيجة */
+        #result-box {
+            display: none; text-align: center; padding: 35px 25px;
+            background: var(--card2);
+            border: 1px solid var(--gold-border);
+            border-radius: 16px;
+            animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .result-icon { font-size: 3.5rem; margin-bottom: 12px; }
+        #result-box h2 {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.6rem; margin-bottom: 8px;
+        }
+        #result-box .hadith { color: var(--muted); font-size: 0.9rem; font-style: italic; margin-bottom: 20px; }
+        .score {
+            font-size: 4rem; font-weight: 900; margin: 10px 0;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .time-used { color: var(--muted); font-size: 0.95rem; margin-bottom: 14px; }
+        #feedback-text {
+            font-size: 1.05rem; font-weight: 600; color: var(--white);
+            line-height: 1.7; background: var(--gold-soft);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px; padding: 14px 18px; margin: 16px 0 24px;
+        }
+
+        /* مراجعة */
+        #review-section { display: none; margin-top: 30px; text-align: right; }
+        #review-section h3 {
+            color: var(--gold-light); font-size: 1.3rem;
+            margin-bottom: 18px;
+            border-right: 4px solid var(--gold);
+            padding-right: 12px;
+        }
+        .review-item {
+            background: var(--card2); border-radius: 10px;
+            padding: 16px 18px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-right: 4px solid transparent;
+        }
+        .review-item.is-correct { border-right-color: #4caf50; }
+        .review-item.is-wrong   { border-right-color: #ef5350; }
+        .review-item .q-text { font-weight: 700; color: var(--white); margin-bottom: 8px; font-size: 0.97rem; }
+        .review-item .r-correct { color: #81c784; font-weight: 600; margin-top: 4px; font-size: 0.93rem; }
+        .review-item .r-wrong   { color: #ef9a9a; font-weight: 600; font-size: 0.93rem; }
+        .review-badge {
+            display: inline-block; padding: 3px 12px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;
+        }
+        .badge-correct { background: rgba(76,175,80,0.15); color: #81c784; border: 1px solid rgba(76,175,80,0.3); }
+        .badge-wrong   { background: rgba(239,83,80,0.12); color: #ef9a9a; border: 1px solid rgba(239,83,80,0.3); }
+
+        footer {
+            margin-top: auto; padding: 18px; text-align: center;
+            font-size: 0.85rem; color: var(--muted);
+            width: 100%;
+            background: #000;
+            border-top: 1px solid var(--gold-border);
+            position: relative; z-index: 10;
+            letter-spacing: 1px;
+        }
+        footer span { color: var(--gold); }
+
+        @keyframes fadeIn  { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes scaleUp { from { opacity:0; transform:scale(0.92); }      to { opacity:1; transform:scale(1); } }
+        @keyframes pulse   { from { opacity:1; } to { opacity:0.4; } }
+    </style>
+</head>
+<body>
+
+<div class="progress-container" id="p-container">
+    <div class="progress-bar" id="p-bar"></div>
+</div>
+
+<header>
+    <div class="header-ornament">✦ ❖ ✦</div>
+    <h1>فقه المسلم</h1>
+    <p>الاختبار الفقهي والديني الشامل</p>
+</header>
+
+<!-- شاشة الدخول -->
+<div class="container" id="login-box">
+    <div class="login-icon">🕌</div>
+    <h2 id="login-title">أهلاً وسهلاً</h2>
+    <p class="subtitle" id="login-subtitle">سجّل دخولك وابدأ تحدي المعرفة الإسلامية</p>
+
+    <div class="input-group">
+        <label for="username">📛 الاسم الكريم:</label>
+        <input type="text" id="username" placeholder="أدخل اسمك هنا..." autocomplete="off">
+    </div>
+    <div class="input-group">
+        <label for="password">🔐 كلمة السر:</label>
+        <input type="password" id="password" placeholder="اختر كلمة سر خاصة بك...">
+        <div class="error-msg" id="pass-error"></div>
+    </div>
+    <div class="input-group" id="confirm-group">
+        <label for="password-confirm">🔐 تأكيد كلمة السر:</label>
+        <input type="password" id="password-confirm" placeholder="أعد إدخال كلمة السر...">
+        <div class="error-msg" id="confirm-error">❌ كلمة السر غير متطابقة</div>
+    </div>
+    <button type="button" class="btn-main btn-gold" id="login-btn" onclick="handleLogin()">تسجيل وبدء التحدي ←</button>
+</div>
+
+<!-- الاختبار -->
+<div class="container" id="quiz-section">
+    <div class="quiz-info">
+        <div>👤 أهلاً: <span id="user-welcome"></span></div>
+        <div>📊 أجبت على: <span id="answered-count">0</span> / <span id="total-q-count">0</span></div>
+    </div>
+
+    <div id="timer-wrap">
+        <div id="timer-display">⏱ 20:00</div>
+        <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
+    </div>
+
+    <form id="quiz-form">
+        <div id="quiz-questions"></div>
+        <button type="button" class="btn-main btn-gold" onclick="calculateScore()">✅ عرض النتيجة النهائية</button>
+    </form>
+
+    <div id="result-box">
+        <div class="result-icon" id="result-icon">🏆</div>
+        <h2>الحمد لله الذي بنعمته تتم الصالحات</h2>
+        <p class="hadith">"من سلك طريقاً يلتمس فيه علماً سهّل الله له طريقاً إلى الجنة"</p>
+        <p id="user-result-name" style="font-size:1.05rem; color:var(--muted); margin-bottom:4px;"></p>
+        <div class="score" id="score-text">0 / 0</div>
+        <div class="time-used" id="time-used-text"></div>
+        <div id="feedback-text"></div>
+        <button type="button" class="btn-main" onclick="toggleReview()">📋 مراجعة الإجابات التفصيلية</button>
+        <button type="button" class="btn-main btn-gold" style="margin-top:12px;" onclick="window.location.reload()">🔄 إعادة الاختبار</button>
+    </div>
+
+    <div id="review-section">
+        <h3>📝 مراجعة تفصيلية للإجابات</h3>
+        <div id="review-list"></div>
+    </div>
+</div>
+
+<footer>جميع الحقوق محفوظة &nbsp;|&nbsp; <span>منصة فقه المسلم</span> &copy; 2026 &nbsp;✦</footer>
+
+<script>
+    const QUIZ_TIME_SECONDS = 20 * 60;
+    let currentUserName = "";
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let userAnswers = {};
+    let quizSubmitted = false;
+    let reviewVisible = false;
+
+    function getUsers() {
+        try { return JSON.parse(localStorage.getItem('fiqh_users') || '{}'); } catch { return {}; }
+    }
+    function saveUsers(u) { localStorage.setItem('fiqh_users', JSON.stringify(u)); }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('username').addEventListener('input', updateLoginMode);
+    });
+
+    function updateLoginMode() {
+        const name = document.getElementById('username').value.trim();
+        const users = getUsers();
+        const confirmGroup = document.getElementById('confirm-group');
+        const subtitle = document.getElementById('login-subtitle');
+        const btn = document.getElementById('login-btn');
+        const passInput = document.getElementById('password');
+        if (name && users[name]) {
+            confirmGroup.style.display = 'none';
+            subtitle.innerText = `مرحباً بعودتك ${name}! أدخل كلمة سرك للمتابعة.`;
+            btn.innerText = 'دخول والبدء في التحدي ←';
+            passInput.placeholder = 'أدخل كلمة سرك...';
+        } else {
+            confirmGroup.style.display = 'block';
+            subtitle.innerText = 'مستخدم جديد؟ اختر كلمة سر خاصة بك وابدأ!';
+            btn.innerText = 'تسجيل وبدء التحدي ←';
+            passInput.placeholder = 'اختر كلمة سر خاصة بك...';
+        }
+    }
+
+    function handleLogin() {
+        const name = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+        const passConfirm = document.getElementById('password-confirm').value.trim();
+        const passErr = document.getElementById('pass-error');
+        const confirmErr = document.getElementById('confirm-error');
+        passErr.style.display = 'none';
+        confirmErr.style.display = 'none';
+
+        if (!name) { alert("فضلاً، أدخل اسمك أولاً."); return; }
+        if (!pass)  { alert("فضلاً، أدخل كلمة السر."); return; }
+
+        const users = getUsers();
+        if (users[name]) {
+            if (users[name] !== pass) {
+                passErr.innerText = '❌ كلمة السر غير صحيحة، حاول مرة أخرى.';
+                passErr.style.display = 'block';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+                return;
+            }
+        } else {
+            if (pass.length < 4) {
+                passErr.innerText = '❌ كلمة السر يجب أن تكون 4 أحرف على الأقل.';
+                passErr.style.display = 'block';
+                return;
+            }
+            if (pass !== passConfirm) {
+                confirmErr.style.display = 'block';
+                return;
+            }
+            users[name] = pass;
+            saveUsers(users);
+        }
+
+        currentUserName = name;
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        document.getElementById('p-container').style.display = 'block';
+        document.getElementById('user-welcome').innerText = currentUserName;
+        loadQuiz();
+        startTimer();
+    }
+
+    function startTimer() {
+        secondsElapsed = 0;
+        updateTimerDisplay(QUIZ_TIME_SECONDS);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const remaining = QUIZ_TIME_SECONDS - secondsElapsed;
+            updateTimerDisplay(remaining);
+            if (remaining <= 60) {
+                document.getElementById('timer-display').classList.add('warning');
+                document.getElementById('timer-bar').style.background = 'linear-gradient(90deg, #ef5350, #ff8a80)';
+                document.getElementById('timer-bar').style.boxShadow = '0 0 8px #ef5350';
+            }
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                alert("⏰ انتهى الوقت! سيتم عرض نتيجتك الآن.");
+                calculateScore();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay(remaining) {
+        const m = Math.floor(remaining / 60).toString().padStart(2,'0');
+        const s = (remaining % 60).toString().padStart(2,'0');
+        document.getElementById('timer-display').innerText = `⏱ ${m}:${s}`;
+        document.getElementById('timer-bar').style.width = ((remaining / QUIZ_TIME_SECONDS) * 100) + '%';
+    }
+
+    const quizData = [
+        { question: "ما هو الركن الثاني من أركان الإسلام؟", options: ["إيتاء الزكاة","إقام الصلاة","صوم رمضان","حج البيت"], correct: 1 },
+        { question: "ما هي أطول سورة في القرآن الكريم؟", options: ["سورة آل عمران","سورة النساء","سورة البقرة","سورة المائدة"], correct: 2 },
+        { question: "كم عدد الصلوات المفروضة في اليوم والليلة؟", options: ["3 صلوات","5 صلوات","7 صلوات","12 صلاة"], correct: 1 },
+        { question: "من هو النبي الذي لُقب بـ 'أبو الأنبياء'؟", options: ["نوح عليه السلام","موسى عليه السلام","إبراهيم عليه السلام","عيسى عليه السلام"], correct: 2 },
+        { question: "ما هي السورة التي تعدل ثلث القرآن الكريم؟", options: ["سورة الإخلاص","سورة الفاتحة","سورة الكافرون","سورة يس"], correct: 0 },
+        { question: "كم عدد أركان الإيمان؟", options: ["خمسة أركان","ستة أركان","سبعة أركان","أربعة أركان"], correct: 1 },
+        { question: "ما هو الميقات المكاني لأهل المدينة المنورة في الحج والعمرة؟", options: ["قرن المنازل","يلملم","ذو الحليفة (آبار علي)","الجحفة"], correct: 2 },
+        { question: "ما حكم صلاة الوتر في الفقه الإسلامي؟", options: ["فرض عين","سنة مؤكدة","مباحة","فرض كفاية"], correct: 1 },
+        { question: "في أي شهر هجري فُرِض صيام رمضان؟", options: ["شعبان","رجب","رمضان نفسه","شوال"], correct: 0 },
+        { question: "ما هي أقصر سورة في القرآن الكريم؟", options: ["سورة النصر","سورة العصر","سورة الإخلاص","سورة الكوثر"], correct: 3 },
+        { question: "كم عدد سجدات التلاوة في القرآن الكريم؟", options: ["10 سجدات","12 سجدة","15 سجدة","7 سجدات"], correct: 2 },
+        { question: "من هو الصحابي الذي لُقِّب بـ 'أمين هذه الأمة'؟", options: ["أبو عبيدة بن الجراح","عمر بن الخطاب","أبو بكر الصديق","علي بن أبي طالب"], correct: 0 },
+        { question: "ما هو السن المعتبر شرعاً للأضحية من الغنم (الضأن)؟", options: ["أن تتم ستة أشهر","أن تتم سنة كاملة","أن تتم سنتين","لا حد لسنها"], correct: 0 },
+        { question: "أي من الخيارات التالية يُبطل الصيام؟", options: ["الحجامة","القيء عمداً","استخدام السواك","قطرة العين"], correct: 1 },
+        { question: "كم عدد أركان الصلاة؟", options: ["14 ركناً","10 أركان","5 أركان","17 ركناً"], correct: 0 },
+        { question: "ما هي الصلاة التي لا ركوع فيها ولا سجود؟", options: ["صلاة الكسوف","صلاة الاستسقاء","صلاة الجنازة","صلاة العيد"], correct: 2 },
+        { question: "من هو أول الخلفاء الراشدين؟", options: ["عمر بن الخطاب","عثمان بن عفان","علي بن أبي طالب","أبو بكر الصديق"], correct: 3 },
+        { question: "كم عدد مصارف الزكاة التي وردت في سورة التوبة؟", options: ["5 مصارف","6 مصارف","8 مصارف","10 مصارف"], correct: 2 },
+        { question: "ما هو الركن الأعظم في الحج؟", options: ["الطواف","السعي","الوقوف بعرفة","الإحرام"], correct: 2 },
+        { question: "في أي سنة هجرية فرض الصيام؟", options: ["السنة الأولى للهجرة","السنة الثانية للهجرة","السنة الثالثة للهجرة","السنة الخامسة للهجرة"], correct: 1 },
+        { question: "ماذا يسمى المطر في قوله تعالى 'وأنزلنا من المعصرات ماءً...'؟", options: ["فراتاً","ثجاجاً","مدراراً","مباركاً"], correct: 1 },
+        { question: "من هي أولى زوجات الرسول ﷺ؟", options: ["عائشة بنت أبي بكر","خديجة بنت خويلد","حفصة بنت عمر","أم سلمة"], correct: 1 },
+        { question: "ما هو الحكم الشرعي لصلوات السنن الرواتب؟", options: ["واجبة","مستحبة (سنة)","فرض كفاية","مباحة"], correct: 1 },
+        { question: "كم عدد الغزوات التي قادها الرسول ﷺ بنفسه؟", options: ["17 غزوة","27 غزوة","9 غزوات","35 غزوة"], correct: 1 },
+        { question: "ما هي عاصمة الدولة الإسلامية في عهد الخلفاء الراشدين الأولين؟", options: ["مكة المكرمة","المدينة المنورة","الكوفة","دمشق"], correct: 1 },
+        { question: "ما هي السورة التي تسمى 'عروس القرآن'؟", options: ["سورة الرحمن","سورة يس","سورة الواقعة","سورة الملك"], correct: 0 },
+        { question: "ما هي كفارة اليمين المنعقدة إذا عجز المرء عن الإطعام والكسوة والعتق؟", options: ["صيام ثلاثة أيام","صيام شهر كامل","صيام عشرة أيام","إطعام عشرين مسكيناً"], correct: 0 },
+        { question: "ما حكم قراءة سورة الفاتحة للمأموم في الصلاة الجهرية عند جمهور العلماء؟", options: ["فرض مطلقاً","مستحبة أو تسقط بإنصاته للإمام","محرمة","مكروهة"], correct: 1 },
+        { question: "على من تجب زكاة الفطر؟", options: ["على الأغنياء فقط","على كل مسلم ملك قوت يومه وليلته","على التجار فقط","تجب على البالغين دون الصغار"], correct: 1 },
+        { question: "ما هي السورة التي تسمى 'المنجية' من عذاب القبر؟", options: ["سورة الكهف","سورة السجدة","سورة الملك","سورة الدخان"], correct: 2 },
+        { question: "كم كان عمر النبي ﷺ عندما نزل عليه الوحي أول مرة؟", options: ["25 سنة","30 سنة","40 سنة","45 سنة"], correct: 2 },
+        { question: "ما السن المعتبرة لذكاة البقر (الأضحية)؟", options: ["أن تتم سنة","أن تتم سنتين وتدخل في الثالثة","أن تتم خمس سنوات","أن تتم ستة أشهر"], correct: 1 },
+        { question: "ما هي أطول آية في القرآن الكريم؟", options: ["آية الكرسي","آية الدين في سورة البقرة","الآية الأولى من سورة النساء","آية المداينة في سورة المائدة"], correct: 1 },
+        { question: "ما هو النوم الذي لا ينقض الوضوء؟", options: ["النوم العميق مستغرقاً","النوم اليسير جالساً أو ممكناً مقعدته","النوم على الجانب الأيمن","كل أنواع النوم تنقض"], correct: 1 },
+        { question: "كم عدد التكبيرات في الركعة الأولى من صلاة العيد (غير تكبيرة الإحرام) على المشهور؟", options: ["3 تكبيرات","5 تكبيرات","6 أو 7 تكبيرات","12 تكبيرة"], correct: 2 },
+        { question: "من هو النبي الذي ابتلعه الحوت؟", options: ["يونس عليه السلام","يوسف عليه السلام","أيوب عليه السلام","سليمان عليه السلام"], correct: 0 },
+        { question: "أي من الغسلات يعد فرضاً في الوضوء؟", options: ["الغسلة الأولى","الغسلة الثانية","الغسلة الثالثة","جميع الغسلات الثلاث فرض"], correct: 0 },
+        { question: "ما هي ميقات الإحرام لأهل الشام ومصر والمغرب؟", options: ["ذو الحليفة","الجحفة (رابغ)","يلملم","ذات عرق"], correct: 1 },
+        { question: "ما هي السورة التي بدأت بغير بسملة؟", options: ["سورة النمل","سورة التوبة (براءة)","سورة الأنفال","سورة الهود"], correct: 1 },
+        { question: "ما حكم الأكل أو الشرب ناسياً في نهار رمضان؟", options: ["يبطل الصيام ويجب القضاء","لا يبطل الصيام وصيامه صحيح","يبطل الصيام ويجب الكفارة الكبرى","صحيح لكن عليه فدية"], correct: 1 },
+        { question: "في أي سورة وردت آية الحجاب؟", options: ["سورة الأحزاب","سورة النور","كلاهما ورد فيهما آيات تخص الحجاب والستر","سورة النساء"], correct: 2 },
+        { question: "كم عدد السور المكية في القرآن الكريم تقريباً مقارنة بالمدنية؟", options: ["المكية هي الأقل","المكية هي الأكثر (نحو 86 سورة)","متساويان تماماً","القرآن كله مكي"], correct: 1 }
+    ];
+
+    function loadQuiz() {
+        document.getElementById('total-q-count').innerText = quizData.length;
+        const container = document.getElementById('quiz-questions');
+        container.innerHTML = '';
+        quizData.forEach((qData, qIndex) => {
+            let optionsHtml = '';
+            qData.options.forEach((option, oIndex) => {
+                optionsHtml += `
+                    <label class="option-item" id="opt-${qIndex}-${oIndex}" onclick="selectOption(${qIndex}, ${oIndex}, this)">
+                        <input type="radio" name="question${qIndex}" value="${oIndex}">
+                        ${option}
+                    </label>`;
+            });
+            container.innerHTML += `
+                <div class="question-container">
+                    <div class="question-title">${qIndex + 1}. ${qData.question}</div>
+                    <div class="options-list">${optionsHtml}</div>
+                </div>`;
+        });
+    }
+
+    function selectOption(qIndex, oIndex, element) {
+        if (quizSubmitted) return;
+        for (let i = 0; i < quizData[qIndex].options.length; i++) {
+            const el = document.getElementById(`opt-${qIndex}-${i}`);
+            if (el) el.classList.remove('selected');
+        }
+        element.classList.add('selected');
+        element.querySelector('input').checked = true;
+        userAnswers[qIndex] = oIndex;
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const answered = Object.keys(userAnswers).length;
+        document.getElementById('answered-count').innerText = answered;
+        document.getElementById('p-bar').style.width = ((answered / quizData.length) * 100) + '%';
+    }
+
+    function calculateScore() {
+        if (quizSubmitted) return;
+        quizSubmitted = true;
+        clearInterval(timerInterval);
+
+        let score = 0;
+        quizData.forEach((qData, qIndex) => {
+            const userAns = userAnswers[qIndex];
+            for (let i = 0; i < qData.options.length; i++) {
+                const el = document.getElementById(`opt-${qIndex}-${i}`);
+                if (!el) continue;
+                el.style.pointerEvents = 'none';
+                if (i === qData.correct) el.classList.add('correct-answer');
+                else if (userAns !== undefined && i === userAns && userAns !== qData.correct)
+                    el.classList.add('wrong-answer');
+            }
+            if (userAns === qData.correct) score++;
+        });
+
+        document.getElementById('quiz-form').style.display = 'none';
+        const resultBox = document.getElementById('result-box');
+        resultBox.style.display = 'block';
+
+        const pct = (score / quizData.length) * 100;
+        let icon = '🏆', feedback = '';
+        if      (pct === 100) { icon = '🏆'; feedback = '✨ ممتاز! أجبت على جميع الأسئلة بشكل صحيح. بارك الله فيك وزادك علماً ونوراً.'; }
+        else if (pct >= 80)   { icon = '⭐'; feedback = '🌟 أداء رائع جداً! معرفتك الفقهية قوية ومتميزة، واصل هذا التفوق.'; }
+        else if (pct >= 60)   { icon = '👍'; feedback = '📗 جيد! تمتلك قاعدة معرفية جيدة، واصل التعلم والمراجعة.'; }
+        else if (pct >= 40)   { icon = '📚'; feedback = '📘 مقبول. ننصحك بمراجعة المسائل الفقهية الأساسية والاطلاع أكثر.'; }
+        else                  { icon = '🔄'; feedback = '💪 لا تيأس! مراجعة الإجابات أدناه ستساعدك كثيراً في المرة القادمة.'; }
+
+        document.getElementById('result-icon').innerText = icon;
+        document.getElementById('user-result-name').innerText = `أحسنت يا ${currentUserName} 🌙`;
+        document.getElementById('score-text').innerText = `${score} / ${quizData.length}`;
+        document.getElementById('feedback-text').innerText = feedback;
+
+        const m = Math.floor(secondsElapsed/60).toString().padStart(2,'0');
+        const s = (secondsElapsed%60).toString().padStart(2,'0');
+        document.getElementById('time-used-text').innerText = `⏱ الوقت المستغرق: ${m}:${s}`;
+
+        buildReview();
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function buildReview() {
+        const list = document.getElementById('review-list');
+        list.innerHTML = '';
+        quizData.forEach((qData, qIndex) => {
+            const userAns = userAnswers[qIndex];
+            const isCorrect = userAns === qData.correct;
+            list.innerHTML += `
+                <div class="review-item ${isCorrect ? 'is-correct' : 'is-wrong'}">
+                    <span class="review-badge ${isCorrect ? 'badge-correct' : 'badge-wrong'}">
+                        ${isCorrect ? '✅ صحيح' : '❌ خطأ'}
+                    </span>
+                    <div class="q-text">${qIndex+1}. ${qData.question}</div>
+                    ${!isCorrect ? `<div class="r-wrong">إجابتك: ${userAns !== undefined ? qData.options[userAns] : 'لم تجب'}</div>` : ''}
+                    <div class="r-correct">✔ الإجابة الصحيحة: ${qData.options[qData.correct]}</div>
+                </div>`;
+        });
+    }
+
+    function toggleReview() {
+        const sec = document.getElementById('review-section');
+        reviewVisible = !reviewVisible;
+        sec.style.display = reviewVisible ? 'block' : 'none';
+        if (reviewVisible) sec.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && document.getElementById('login-box').style.display !== 'none')
+            handleLogin();
+    });
+</script>
+</body>
+</html>
