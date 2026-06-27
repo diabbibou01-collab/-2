@@ -357,7 +357,10 @@
     <div class="header-ornament">✦ ❖ ✦</div>
     <h1>فقه المسلم</h1>
     <p>الاختبار الفقهي والديني الشامل</p>
-    <button onclick="showLeaderboard()" style="margin-top:14px; background:linear-gradient(135deg,#c9a84c,#f0d080); color:#000; border:none; padding:9px 24px; border-radius:20px; font-weight:700; font-size:0.95rem; cursor:pointer;">🏆 لوحة المتصدرين</button>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;">
+        <button onclick="showLeaderboard()" style="background:linear-gradient(135deg,#c9a84c,#f0d080); color:#000; border:none; padding:9px 24px; border-radius:20px; font-weight:700; font-size:0.95rem; cursor:pointer;">🏆 المتصدرون</button>
+        <button onclick="showUsers()" style="background:transparent; color:var(--gold-light); border:1px solid var(--gold-border); padding:9px 24px; border-radius:20px; font-weight:700; font-size:0.95rem; cursor:pointer;">👥 المستخدمون</button>
+    </div>
 </header>
 
 <!-- شاشة الدخول -->
@@ -367,7 +370,7 @@
     <p class="subtitle" id="login-subtitle">سجّل دخولك وابدأ تحدي المعرفة الإسلامية</p>
 
     <div class="input-group">
-        <label for="username">الاسم الكامل🤔:</label>
+        <label for="username">📛 الاسم الكامل:</label>
         <input type="text" id="username" placeholder="أدخل اسمك هنا..." autocomplete="off">
     </div>
     <div class="input-group">
@@ -375,11 +378,7 @@
         <input type="password" id="password" placeholder="اختر كلمة سر خاصة بك...">
         <div class="error-msg" id="pass-error"></div>
     </div>
-    <div class="input-group" id="confirm-group">
-        <label for="password-confirm">🔐 تأكيد كلمة السر:</label>
-        <input type="password" id="password-confirm" placeholder="أعد إدخال كلمة السر...">
-        <div class="error-msg" id="confirm-error">❌ كلمة السر غير متطابقة</div>
-    </div>
+
     <button type="button" class="btn-main btn-gold" id="login-btn" onclick="handleLogin()">تسجيل وبدء التحدي ←</button>
 </div>
 
@@ -393,6 +392,14 @@
     </div>
     <div id="lb-content"></div>
     <button type="button" class="btn-main" style="margin-top:20px;" onclick="hideLeaderboard()">← رجوع</button>
+</div>
+
+<!-- صفحة المستخدمين -->
+<div class="container" id="users-box" style="display:none; animation: fadeIn 0.5s ease;">
+    <h2 style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1.8rem;text-align:center;margin-bottom:6px;">👥 المستخدمون</h2>
+    <p style="color:var(--muted);text-align:center;font-size:0.9rem;margin-bottom:25px;">جميع المسجلين في منصة فقه المسلم</p>
+    <div id="users-content"></div>
+    <button type="button" class="btn-main" style="margin-top:20px;" onclick="hideUsers()">← رجوع</button>
 </div>
 
 <!-- الاختبار -->
@@ -425,26 +432,4 @@
         <button type="button" class="btn-main btn-gold" style="margin-top:12px;" onclick="window.location.reload()">🔄 إعادة الاختبار</button>
     </div>
 
-    <div id="review-section">
-        <h3>📝 مراجعة تفصيلية للإجابات</h3>
-        <div id="review-list"></div>
-    </div>
-</div>
-
-<footer>جميع الحقوق محفوظة &nbsp;|&nbsp; <span>منصة فقه المسلم</span> &copy; 2026 &nbsp;✦</footer>
-
-<script>
-    const QUIZ_TIME_SECONDS = 20 * 60;
-    let currentUserName = "";
-    let timerInterval = null;
-    let secondsElapsed = 0;
-    let userAnswers = {};
-    let quizSubmitted = false;
-    let reviewVisible = false;
-
-    function getUsers() {
-        try { return JSON.parse(localStorage.getItem('fiqh_users') || '{}'); } catch { return {}; }
-    }
-    function saveUsers(u) { localStorage.setItem('fiqh_users', JSON.stringify(u)); }
-
-    wind
+    <div id="r
